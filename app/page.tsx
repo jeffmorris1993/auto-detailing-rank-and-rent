@@ -1,65 +1,98 @@
-import Image from "next/image";
+import Link from "next/link";
+import type { Metadata } from "next";
+import { Hero } from "@/components/Hero";
+import { ServiceCards } from "@/components/ServiceCards";
+import { CityLinks } from "@/components/CityLinks";
+import { FAQSection } from "@/components/FAQSection";
+import { QuoteRequestForm } from "@/components/QuoteRequestForm";
+import { CTASection } from "@/components/CTASection";
+import { JsonLd } from "@/components/JsonLd";
+import { buildMetadata } from "@/lib/seo";
+import { GLOBAL_FAQS } from "@/lib/pages";
+import { breadcrumbSchema, faqSchema } from "@/lib/schema";
+import { BRAND } from "@/lib/site-config";
 
-export default function Home() {
+export const metadata: Metadata = buildMetadata({
+  title: `Mobile Car Detailing in Birmingham, MI | ${BRAND.name}`,
+  description:
+    "Mobile car wash and detailing requests across Birmingham, Bloomfield Hills, Rochester Hills, and Troy, MI. Get connected with available local providers.",
+  path: "/",
+});
+
+export default function HomePage() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <>
+      <JsonLd
+        data={[
+          faqSchema(GLOBAL_FAQS),
+          breadcrumbSchema([{ name: "Home", path: "/" }]),
+        ]}
+      />
+
+      <Hero
+        eyebrow="Oakland County, Michigan"
+        h1="Mobile Car Detailing in Birmingham, MI"
+        subhead="Mobile car wash and detailing brought to your driveway, office, or wherever your car is parked — across Birmingham, Bloomfield Hills, Rochester Hills, and Troy."
+        directAnswer="Mobile car detailing in Birmingham, MI brings a wash, vacuum, and detailing service to your location. Submit a request and we will connect you with available local mobile detailing providers serving Oakland County, Michigan."
+        trackingLocation="home_hero"
+      />
+
+      <section className="bg-white py-14 sm:py-20">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+            A simple way to book mobile detailing in Oakland County
+          </h2>
+          <p className="mt-4 text-lg text-slate-700">
+            We are a local request and referral service. Submit a quick request
+            and we will help connect you with available mobile detailing
+            providers who serve your area. No driving to a wash bay, no waiting
+            in line.
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+          <div className="mt-8 grid gap-6 sm:grid-cols-3">
+            <Highlight
+              title="Comes to you"
+              body="At your home, condo, or workplace — wherever your vehicle is parked."
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <Highlight
+              title="Local providers"
+              body="Mobile detailing providers serving Birmingham and nearby Oakland County cities."
+            />
+            <Highlight
+              title="Honest matching"
+              body="We don't pretend to be the detailer. We help you get connected."
+            />
+          </div>
         </div>
-      </main>
+      </section>
+
+      <ServiceCards />
+
+      <CityLinks />
+
+      <QuoteRequestForm trackingLocation="home" />
+
+      <FAQSection faqs={GLOBAL_FAQS} />
+
+      <section className="bg-white py-12">
+        <div className="mx-auto max-w-4xl px-4 text-center text-sm text-slate-500 sm:px-6 lg:px-8">
+          For an AI-friendly plain-text summary of our service, see{" "}
+          <Link href="/llm.html" className="underline hover:text-brand-700">
+            /llm.html
+          </Link>
+          .
+        </div>
+      </section>
+
+      <CTASection trackingLocation="home_bottom" />
+    </>
+  );
+}
+
+function Highlight({ title, body }: { title: string; body: string }) {
+  return (
+    <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
+      <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
+      <p className="mt-2 text-sm text-slate-700">{body}</p>
     </div>
   );
 }
