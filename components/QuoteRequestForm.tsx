@@ -1,24 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DISCLOSURE } from "@/lib/site-config";
-import { trackLeadSubmit, readUtmParams, type LeadFormPayload } from "@/lib/tracking";
+import { submitLeadAction } from "@/app/actions/submit-lead";
 
 type QuoteRequestFormProps = {
+  /** Pre-select the service dropdown. Must match a SERVICES entry. */
   defaultService?: string;
+  /** Pre-select the city dropdown. Must match a CITIES entry. */
   defaultCity?: string;
+  /** Server-known identifier for the page hosting the form (e.g. route slug). */
+  sourcePage?: string;
   heading?: string;
   intro?: string;
-  trackingLocation?: string;
   id?: string;
 };
 
 const SERVICES = [
-  "Mobile car detailing",
-  "Mobile car wash",
-  "Interior detailing",
-  "Exterior detailing",
-  "Ceramic coating",
+  "Mobile Car Detailing",
+  "Mobile Car Wash",
+  "Interior Car Detailing",
+  "Exterior Car Detailing",
+  "Ceramic Coating",
   "Not sure — recommend something",
 ];
 
@@ -46,16 +49,47 @@ const TIMING_OPTIONS = [
   "Flexible — schedule when available",
 ];
 
+type Status = "idle" | "submitting" | "success" | "error";
+
 export function QuoteRequestForm({
   defaultService = "",
   defaultCity = "",
+  sourcePage = "",
   heading = "Request a quote",
-  intro = "Tell us about your vehicle and we'll connect you with available local providers.",
-  trackingLocation = "page",
+  intro = "Tell us about your vehicle and we'll check whether a local provider is available in your area.",
   id = "quote",
 }: QuoteRequestFormProps) {
-  const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const errorRef = useRef<HTMLParagraphElement>(null);
+
+  // Populate hidden URL / referrer / UTM fields on mount (client-only).
+  const [hidden, setHidden] = useState({
+    page_url: "",
+    referrer: "",
+    utm_source: "",
+    utm_medium: "",
+    utm_campaign: "",
+    utm_term: "",
+    utm_content: "",
+  });
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    setHidden({
+      page_url: window.location.href,
+      referrer: document.referrer || "direct",
+      utm_source: params.get("utm_source") ?? "",
+      utm_medium: params.get("utm_medium") ?? "",
+      utm_campaign: params.get("utm_campaign") ?? "",
+      utm_term: params.get("utm_term") ?? "",
+      utm_content: params.get("utm_content") ?? "",
+    });
+  }, []);
+
+  const initialService = SERVICES.includes(defaultService) ? defaultService : "";
+  const initialCity = CITIES.includes(defaultCity) ? defaultCity : "";
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -63,69 +97,18 @@ export function QuoteRequestForm({
     setErrorMessage("");
 
     const formData = new FormData(event.currentTarget);
+    const result = await submitLeadAction(formData);
 
-    const required: Array<keyof LeadFormPayload> = [
-      "name",
-      "phone",
-      "email",
-      "city",
-      "service",
-      "vehicleType",
-    ];
-
-    for (const key of required) {
-      const val = (formData.get(key) as string | null)?.trim();
-      if (!val) {
-        setErrorMessage("Please fill in all required fields.");
-        setStatus("error");
-        return;
-      }
-    }
-
-    const phone = (formData.get("phone") as string).trim();
-    if (phone.replace(/\D/g, "").length < 10) {
-      setErrorMessage("Please enter a valid phone number.");
-      setStatus("error");
-      return;
-    }
-
-    const email = (formData.get("email") as string).trim();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setErrorMessage("Please enter a valid email address.");
-      setStatus("error");
-      return;
-    }
-
-    const utms = readUtmParams(window.location.search);
-
-    const payload: LeadFormPayload = {
-      name: (formData.get("name") as string).trim(),
-      phone,
-      email,
-      city: formData.get("city") as string,
-      service: formData.get("service") as string,
-      vehicleType: formData.get("vehicleType") as string,
-      vehicleCondition: (formData.get("vehicleCondition") as string) ?? "",
-      preferredTiming: (formData.get("preferredTiming") as string) ?? "",
-      message: ((formData.get("message") as string) ?? "").trim(),
-      pageUrl: window.location.href,
-      referrer: document.referrer || "direct",
-      submitted_at: new Date().toISOString(),
-      ...utms,
-    };
-
-    try {
-      // TODO: Replace console log with real submission:
-      //   - POST to a Next.js Route Handler in app/api/lead/route.ts
-      //   - Or directly to Supabase / Resend / Zapier / Vercel Function
-      //   - Add server-side validation and bot protection (Vercel BotID)
-      trackLeadSubmit(payload);
+    if (result.ok) {
       setStatus("success");
       (event.target as HTMLFormElement).reset();
-    } catch {
-      setStatus("error");
-      setErrorMessage("Something went wrong. Please call us instead.");
+      return;
     }
+
+    setStatus("error");
+    setErrorMessage(result.error);
+    // Move focus to the error so screen readers announce it.
+    requestAnimationFrame(() => errorRef.current?.focus());
   }
 
   if (status === "success") {
@@ -144,8 +127,8 @@ export function QuoteRequestForm({
               Request received
             </h2>
             <p className="mt-3 text-base text-emerald-900/90">
-              Thanks. Your request may be shared with available local detailing
-              providers who serve your area. Expect a call or email soon.
+              Thanks — your request has been received. If service becomes
+              available in your area, you may be contacted by a local provider.
             </p>
             <button
               type="button"
@@ -160,12 +143,14 @@ export function QuoteRequestForm({
     );
   }
 
+  const submitting = status === "submitting";
+
   return (
     <section
       id={id}
       className="bg-slate-50 py-14 sm:py-20"
       aria-labelledby={`${id}-heading`}
-      data-tracking-location={trackingLocation}
+      data-source-page={sourcePage || undefined}
     >
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
@@ -181,8 +166,43 @@ export function QuoteRequestForm({
         <form
           onSubmit={handleSubmit}
           noValidate
+          aria-busy={submitting}
           className="space-y-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
         >
+          {/* Honeypot — visually hidden, ignored by humans, filled by bots. */}
+          <div
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              left: "-9999px",
+              top: "auto",
+              width: "1px",
+              height: "1px",
+              overflow: "hidden",
+            }}
+          >
+            <label htmlFor="website">
+              Website (leave blank)
+              <input
+                id="website"
+                name="website"
+                type="text"
+                tabIndex={-1}
+                autoComplete="off"
+              />
+            </label>
+          </div>
+
+          {/* Hidden context fields */}
+          <input type="hidden" name="source_page" value={sourcePage} />
+          <input type="hidden" name="page_url" value={hidden.page_url} />
+          <input type="hidden" name="referrer" value={hidden.referrer} />
+          <input type="hidden" name="utm_source" value={hidden.utm_source} />
+          <input type="hidden" name="utm_medium" value={hidden.utm_medium} />
+          <input type="hidden" name="utm_campaign" value={hidden.utm_campaign} />
+          <input type="hidden" name="utm_term" value={hidden.utm_term} />
+          <input type="hidden" name="utm_content" value={hidden.utm_content} />
+
           <div className="grid gap-5 sm:grid-cols-2">
             <Field id="name" label="Name" required>
               <input
@@ -191,6 +211,7 @@ export function QuoteRequestForm({
                 type="text"
                 autoComplete="name"
                 required
+                maxLength={120}
                 className={inputClass}
               />
             </Field>
@@ -201,6 +222,7 @@ export function QuoteRequestForm({
                 type="tel"
                 autoComplete="tel"
                 required
+                maxLength={32}
                 className={inputClass}
                 placeholder="(248) 555-0123"
               />
@@ -214,6 +236,7 @@ export function QuoteRequestForm({
               type="email"
               autoComplete="email"
               required
+              maxLength={254}
               className={inputClass}
             />
           </Field>
@@ -223,7 +246,7 @@ export function QuoteRequestForm({
               <select
                 id="city"
                 name="city"
-                defaultValue={defaultCity}
+                defaultValue={initialCity}
                 required
                 className={inputClass}
               >
@@ -241,7 +264,7 @@ export function QuoteRequestForm({
               <select
                 id="service"
                 name="service"
-                defaultValue={defaultService}
+                defaultValue={initialService}
                 required
                 className={inputClass}
               >
@@ -258,10 +281,10 @@ export function QuoteRequestForm({
           </div>
 
           <div className="grid gap-5 sm:grid-cols-2">
-            <Field id="vehicleType" label="Vehicle type" required>
+            <Field id="vehicle_type" label="Vehicle type" required>
               <select
-                id="vehicleType"
-                name="vehicleType"
+                id="vehicle_type"
+                name="vehicle_type"
                 required
                 defaultValue=""
                 className={inputClass}
@@ -276,10 +299,10 @@ export function QuoteRequestForm({
                 ))}
               </select>
             </Field>
-            <Field id="vehicleCondition" label="Vehicle condition">
+            <Field id="vehicle_condition" label="Vehicle condition">
               <select
-                id="vehicleCondition"
-                name="vehicleCondition"
+                id="vehicle_condition"
+                name="vehicle_condition"
                 defaultValue=""
                 className={inputClass}
               >
@@ -293,10 +316,10 @@ export function QuoteRequestForm({
             </Field>
           </div>
 
-          <Field id="preferredTiming" label="Preferred timing">
+          <Field id="preferred_timing" label="Preferred timing">
             <select
-              id="preferredTiming"
-              name="preferredTiming"
+              id="preferred_timing"
+              name="preferred_timing"
               defaultValue=""
               className={inputClass}
             >
@@ -314,15 +337,18 @@ export function QuoteRequestForm({
               id="message"
               name="message"
               rows={4}
+              maxLength={2000}
               className={inputClass}
-              placeholder="Year, make, model, or anything else the provider should know."
+              placeholder="Year, make, model, or anything else a provider should know."
             />
           </Field>
 
           {status === "error" && errorMessage && (
             <p
+              ref={errorRef}
               role="alert"
-              className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800"
+              tabIndex={-1}
+              className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800 focus:outline-none"
             >
               {errorMessage}
             </p>
@@ -330,10 +356,16 @@ export function QuoteRequestForm({
 
           <button
             type="submit"
-            disabled={status === "submitting"}
+            disabled={submitting}
             className="inline-flex w-full items-center justify-center rounded-full bg-brand-600 px-6 py-4 text-base font-semibold text-white shadow-sm transition-colors hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
           >
-            {status === "submitting" ? "Submitting…" : "Request my quote"}
+            {submitting ? (
+              <>
+                <Spinner /> Submitting…
+              </>
+            ) : (
+              "Request a Quote"
+            )}
           </button>
 
           <p className="text-xs text-slate-500">{DISCLOSURE.formSubmission}</p>
@@ -372,5 +404,31 @@ function Field({
       </label>
       {children}
     </div>
+  );
+}
+
+function Spinner() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      fill="none"
+      className="mr-2 h-4 w-4 animate-spin"
+    >
+      <circle
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeOpacity="0.25"
+        strokeWidth="3"
+      />
+      <path
+        d="M22 12a10 10 0 0 0-10-10"
+        stroke="currentColor"
+        strokeWidth="3"
+        strokeLinecap="round"
+      />
+    </svg>
   );
 }

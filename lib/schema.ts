@@ -1,14 +1,12 @@
-import { SITE_URL, BRAND, PHONE, SERVICE_AREAS } from "./site-config";
+import { SITE_URL, BRAND, SERVICE_AREAS } from "./site-config";
 import type { FAQ } from "./pages";
 
 /**
  * JSON-LD builders.
  *
- * Notes on honesty:
- * - We intentionally use Organization (not LocalBusiness) at the org level
- *   because we do not operate a physical detailing shop.
- * - Service entities reference the brand as a provider of a referral service,
- *   not as the direct service operator.
+ * MVP framing:
+ * - Organization (not LocalBusiness) — no physical shop, no telephone.
+ * - Services describe what is being requested, not what is actively offered.
  */
 
 export function organizationSchema() {
@@ -18,21 +16,13 @@ export function organizationSchema() {
     "@id": `${SITE_URL}/#organization`,
     name: BRAND.name,
     url: SITE_URL,
-    telephone: PHONE.telPhone,
     email: BRAND.email,
     description:
-      "Local request and referral service connecting visitors with available mobile car wash and detailing providers in Oakland County, Michigan.",
+      "Demand-validation and referral service collecting mobile car wash and detailing requests across Oakland County, Michigan. Not a physical detailing shop. Service availability is not guaranteed.",
     areaServed: SERVICE_AREAS.map((name) => ({
       "@type": "City",
       name,
     })),
-    contactPoint: {
-      "@type": "ContactPoint",
-      telephone: PHONE.telPhone,
-      contactType: "customer service",
-      areaServed: "US-MI",
-      availableLanguage: ["English"],
-    },
   };
 }
 

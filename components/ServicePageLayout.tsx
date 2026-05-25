@@ -110,17 +110,24 @@ export function ServicePageLayout({
           <aside className="lg:col-span-1">
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
               <h2 className="text-lg font-semibold text-slate-900">
-                Talk to a provider sooner
+                Check availability
               </h2>
               <p className="mt-2 text-sm text-slate-700">
-                Call or jump straight to the quote form.
+                Submit a request to find out whether a local provider can serve
+                your area. Service availability is not guaranteed.
               </p>
               <div className="mt-4 flex flex-col gap-2">
                 <Link
                   href="#quote"
-                  className="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white hover:bg-slate-800"
+                  className="inline-flex items-center justify-center rounded-full bg-brand-600 px-5 py-3 text-sm font-semibold text-white hover:bg-brand-700"
                 >
-                  Request Quote
+                  Request a Quote
+                </Link>
+                <Link
+                  href="#quote"
+                  className="inline-flex items-center justify-center rounded-full border border-brand-200 bg-white px-5 py-3 text-sm font-semibold text-brand-700 hover:bg-brand-50"
+                >
+                  Check Availability
                 </Link>
               </div>
             </div>
@@ -151,14 +158,14 @@ export function ServicePageLayout({
       <QuoteRequestForm
         defaultService={service.serviceName}
         defaultCity={service.city}
-        trackingLocation={service.slug}
+        sourcePage={service.slug}
       />
 
       <FAQSection faqs={service.faqs} />
 
       <CityLinks />
 
-      <CTASection trackingLocation={`${service.slug}_bottom`} />
+      <CTASection />
     </>
   );
 }

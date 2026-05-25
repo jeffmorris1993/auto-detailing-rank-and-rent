@@ -3,9 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
-import { BRAND } from "@/lib/site-config";
+import { BRAND, CTA } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
-import { PhoneCallButton } from "./PhoneCallButton";
 
 type NavLink = { href: string; label: string };
 
@@ -30,13 +29,11 @@ export function Header() {
 
   const navRef = useRef<HTMLDivElement>(null);
 
-  // Close any open dropdowns / mobile drawer on route change.
   useEffect(() => {
     setOpenMenu(null);
     setMobileOpen(false);
   }, [pathname]);
 
-  // Click outside closes the open dropdown.
   useEffect(() => {
     if (!openMenu) return;
     function onClick(e: MouseEvent) {
@@ -48,7 +45,6 @@ export function Header() {
     return () => document.removeEventListener("mousedown", onClick);
   }, [openMenu]);
 
-  // Escape closes everything.
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") {
@@ -60,7 +56,6 @@ export function Header() {
     return () => document.removeEventListener("keydown", onKey);
   }, []);
 
-  // Lock body scroll while mobile drawer is open.
   useEffect(() => {
     if (mobileOpen) {
       const prev = document.body.style.overflow;
@@ -145,17 +140,10 @@ export function Header() {
         <div className="flex items-center gap-2">
           <Link
             href="/#quote"
-            className="hidden rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 lg:inline-flex"
+            className="hidden rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-700 sm:inline-flex"
           >
-            Request Quote
+            {CTA.primary}
           </Link>
-          <PhoneCallButton
-            trackingLocation="header"
-            size="sm"
-            variant="primary"
-            label="Call Now"
-            className="hidden sm:inline-flex"
-          />
           <button
             type="button"
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
@@ -251,10 +239,7 @@ function MobileDrawer({
   return (
     <div
       id="mobile-nav"
-      className={cn(
-        "lg:hidden",
-        open ? "block" : "hidden"
-      )}
+      className={cn("lg:hidden", open ? "block" : "hidden")}
     >
       <div
         className="fixed inset-0 top-[57px] z-30 bg-slate-900/40"
@@ -356,9 +341,9 @@ function MobileDrawer({
             <Link
               href="/#quote"
               onClick={onClose}
-              className="block w-full rounded-full bg-slate-900 px-5 py-3 text-center text-sm font-semibold text-white"
+              className="block w-full rounded-full bg-brand-600 px-5 py-3 text-center text-sm font-semibold text-white"
             >
-              Request Quote
+              {CTA.primary}
             </Link>
           </li>
         </ul>

@@ -1,21 +1,14 @@
 import Link from "next/link";
-import { PhoneCallButton } from "./PhoneCallButton";
+import { CTA } from "@/lib/site-config";
 
 type HeroProps = {
   eyebrow?: string;
   h1: string;
   subhead: string;
   directAnswer?: string;
-  trackingLocation?: string;
 };
 
-export function Hero({
-  eyebrow,
-  h1,
-  subhead,
-  directAnswer,
-  trackingLocation = "hero",
-}: HeroProps) {
+export function Hero({ eyebrow, h1, subhead, directAnswer }: HeroProps) {
   return (
     <section className="bg-gradient-to-b from-brand-50 via-white to-white">
       <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
@@ -41,19 +34,21 @@ export function Hero({
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
             <Link
               href="#quote"
-              className="inline-flex items-center justify-center rounded-full bg-slate-900 px-7 py-4 text-base font-semibold text-white shadow-sm transition-colors hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900"
+              className="inline-flex items-center justify-center rounded-full bg-brand-600 px-7 py-4 text-base font-semibold text-white shadow-sm transition-colors hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500"
             >
-              Request Service
+              {CTA.primary}
             </Link>
-            <PhoneCallButton
-              trackingLocation={trackingLocation}
-              size="lg"
-              variant="secondary"
-            />
+            <Link
+              href="#quote"
+              className="inline-flex items-center justify-center rounded-full border border-brand-200 bg-white px-7 py-4 text-base font-semibold text-brand-700 hover:bg-brand-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500"
+            >
+              {CTA.secondary}
+            </Link>
           </div>
 
           <p className="mt-4 text-sm text-slate-500">
-            Get connected with available local providers serving Oakland County, MI.
+            Submit a request to see whether a local provider can serve your area
+            in Oakland County, MI. Service availability is not guaranteed.
           </p>
         </div>
       </div>

@@ -1,16 +1,14 @@
 import Link from "next/link";
-import { PhoneCallButton } from "./PhoneCallButton";
+import { CTA } from "@/lib/site-config";
 
 type CTASectionProps = {
   heading?: string;
   body?: string;
-  trackingLocation?: string;
 };
 
 export function CTASection({
-  heading = "Ready to schedule mobile detailing?",
-  body = "Request a quote in about a minute, or call now to get connected with an available local provider.",
-  trackingLocation = "cta_section",
+  heading = "Check availability in your area",
+  body = "Submit a quote request to find out whether a local mobile detailing provider is available for your vehicle. Service availability is not guaranteed.",
 }: CTASectionProps) {
   return (
     <section className="bg-slate-900">
@@ -21,16 +19,17 @@ export function CTASection({
         <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-300">{body}</p>
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <Link
-            href="#quote"
-            className="inline-flex items-center justify-center rounded-full bg-white px-7 py-4 text-base font-semibold text-slate-900 hover:bg-slate-100"
+            href="/#quote"
+            className="inline-flex items-center justify-center rounded-full bg-white px-7 py-4 text-base font-semibold text-slate-900 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white"
           >
-            Request Service
+            {CTA.primary}
           </Link>
-          <PhoneCallButton
-            trackingLocation={trackingLocation}
-            size="lg"
-            variant="primary"
-          />
+          <Link
+            href="/#quote"
+            className="inline-flex items-center justify-center rounded-full border border-white/40 px-7 py-4 text-base font-semibold text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white"
+          >
+            {CTA.secondary}
+          </Link>
         </div>
       </div>
     </section>

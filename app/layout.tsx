@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   },
   description: BRAND.tagline,
   applicationName: BRAND.name,
-  formatDetection: { telephone: true, address: false, email: false },
+  formatDetection: { telephone: false, address: false, email: false },
 };
 
 export const viewport: Viewport = {
@@ -39,10 +39,17 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable}`}>
       <body className="flex min-h-screen flex-col bg-white font-sans text-slate-900 antialiased">
-        {/* CALL_TRACKING_SCRIPT_GOES_HERE */}
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:rounded-md focus:bg-slate-900 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white focus:outline-none focus:ring-2 focus:ring-brand-500"
+        >
+          Skip to main content
+        </a>
         <JsonLd data={[organizationSchema(), websiteSchema()]} />
         <Header />
-        <main className="flex-1">{children}</main>
+        <main id="main" className="flex-1">
+          {children}
+        </main>
         <Footer />
         <StickyMobileCTA />
       </body>

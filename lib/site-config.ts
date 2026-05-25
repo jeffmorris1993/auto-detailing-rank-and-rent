@@ -1,26 +1,28 @@
 /**
  * Central site configuration.
  *
+ * MVP: form-only demand-validation site. We do NOT publish a phone number,
+ * tel: link, or call-tracking script anywhere on the public site. Visitor
+ * phone numbers are collected on the quote form for follow-up only.
+ *
  * TODO: Update SITE_URL to the real production domain before launch.
- * TODO: Replace displayPhone / telPhone with a real call-tracking number
- *       (e.g. CallRail, CallTrackingMetrics) before launch.
  */
 
-export const SITE_URL = "https://oaklandcountymobiledetailing.com";
+// Production URL is set via NEXT_PUBLIC_SITE_URL. Falls back to the brand
+// domain for local dev and so static metadata still renders something sane.
+export const SITE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://oaklandcountymobiledetailing.com"
+).replace(/\/$/, "");
 
 export const BRAND = {
   name: "Oakland County Mobile Detailing",
   shortName: "OCMD",
-  tagline: "Mobile car wash and detailing requests across Oakland County, MI.",
+  tagline:
+    "Request mobile car wash and detailing in Oakland County, Michigan. Submit a request to check availability in your area.",
   email: "hello@oaklandcountymobiledetailing.com",
   primaryCity: "Birmingham",
   primaryState: "MI",
   primaryRegion: "Oakland County, Michigan",
-} as const;
-
-export const PHONE = {
-  displayPhone: "(248) 555-0123",
-  telPhone: "+12485550123",
 } as const;
 
 export const SERVICE_AREAS = [
@@ -30,14 +32,14 @@ export const SERVICE_AREAS = [
   "Troy, MI",
 ] as const;
 
-export const HOURS = {
-  // Honest hours statement — request form is 24/7, provider scheduling varies.
-  description: "Requests accepted 24/7. Local detailing providers typically schedule appointments 7 days a week, weather permitting.",
-} as const;
-
 export const DISCLOSURE = {
   formSubmission:
-    "By submitting this form, you agree that your request may be shared with available local detailing providers who serve your area.",
-  rankAndRent:
-    "Oakland County Mobile Detailing is a local request and referral service. We connect visitors with available mobile detailing providers serving Oakland County, Michigan. We are not the direct service provider.",
+    "Submitting this form helps us understand demand for mobile detailing services in your area. Your request may be shared with available local providers if service becomes available.",
+  brand:
+    "Oakland County Mobile Detailing collects mobile car wash and detailing requests across Oakland County, Michigan. We are not a detailing shop and we do not guarantee service. If service becomes available in your area, your request may be shared with a local provider.",
+} as const;
+
+export const CTA = {
+  primary: "Request a Quote",
+  secondary: "Check Availability",
 } as const;

@@ -12,7 +12,7 @@ import { breadcrumbSchema, faqSchema } from "@/lib/schema";
 export const metadata: Metadata = buildMetadata({
   title: "Mobile Car Detailing FAQ",
   description:
-    "Frequently asked questions about mobile car wash and detailing requests in Birmingham, Bloomfield Hills, Rochester Hills, and Troy, MI.",
+    "Frequently asked questions about submitting mobile car wash and detailing requests in Birmingham, Bloomfield Hills, Rochester Hills, and Troy, MI.",
   path: "/faq",
 });
 
@@ -39,16 +39,19 @@ export default function FaqPage() {
       <Hero
         eyebrow="FAQ"
         h1="Mobile Car Detailing FAQ"
-        subhead="Quick answers about requesting mobile car wash and detailing in Oakland County, MI."
-        directAnswer="Oakland County Mobile Detailing is a local request and referral service. We connect visitors with available mobile detailing providers serving Birmingham, Bloomfield Hills, Rochester Hills, and Troy, MI."
-        trackingLocation="faq_hero"
+        subhead="Quick answers about submitting mobile car wash and detailing requests in Oakland County, MI."
+        directAnswer="Oakland County Mobile Detailing is a demand-validation and referral service. We collect requests for mobile car wash and detailing in Birmingham, Bloomfield Hills, Rochester Hills, and Troy, MI. Service availability is not guaranteed."
       />
 
       <FAQSection faqs={GLOBAL_FAQS} />
 
-      <QuoteRequestForm trackingLocation="faq" />
+      <QuoteRequestForm
+        sourcePage="faq"
+        defaultCity=""
+        defaultService=""
+      />
 
-      <CTASection trackingLocation="faq_bottom" />
+      <CTASection />
     </>
   );
 }

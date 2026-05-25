@@ -84,8 +84,9 @@ export function CityPageLayout({ city }: CityPageLayoutProps) {
               Mobile detailing across {city.city}
             </h2>
             <p className="mt-4 text-base text-slate-700">
-              Providers in the network commonly service these {city.city}{" "}
-              neighborhoods:
+              We accept requests from these {city.city} neighborhoods (and
+              others). If a local provider becomes available, they may contact
+              you to confirm service.
             </p>
             <ul className="mt-4 grid gap-2 text-base text-slate-700 sm:grid-cols-2">
               {city.neighborhoods.map((n) => (
@@ -169,9 +170,9 @@ export function CityPageLayout({ city }: CityPageLayoutProps) {
       </section>
 
       <QuoteRequestForm
-        defaultService="Mobile car detailing"
+        defaultService="Mobile Car Detailing"
         defaultCity={city.city}
-        trackingLocation={city.slug}
+        sourcePage={city.slug}
       />
 
       <ServiceCards
@@ -181,7 +182,7 @@ export function CityPageLayout({ city }: CityPageLayoutProps) {
 
       <FAQSection faqs={city.faqs} />
 
-      <CTASection trackingLocation={`${city.slug}_bottom`} />
+      <CTASection />
     </>
   );
 }

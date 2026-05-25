@@ -15,7 +15,7 @@ import { BRAND } from "@/lib/site-config";
 export const metadata: Metadata = buildMetadata({
   title: `Mobile Car Detailing in Birmingham, MI | ${BRAND.name}`,
   description:
-    "Mobile car wash and detailing requests across Birmingham, Bloomfield Hills, Rochester Hills, and Troy, MI. Get connected with available local providers.",
+    "Request mobile car wash and detailing across Birmingham, Bloomfield Hills, Rochester Hills, and Troy, MI. Submit a request to check whether a local provider is available in your area.",
   path: "/",
 });
 
@@ -32,34 +32,33 @@ export default function HomePage() {
       <Hero
         eyebrow="Oakland County, Michigan"
         h1="Mobile Car Detailing in Birmingham, MI"
-        subhead="Mobile car wash and detailing brought to your driveway, office, or wherever your car is parked — across Birmingham, Bloomfield Hills, Rochester Hills, and Troy."
-        directAnswer="Mobile car detailing in Birmingham, MI brings a wash, vacuum, and detailing service to your location. Submit a request and we will connect you with available local mobile detailing providers serving Oakland County, Michigan."
-        trackingLocation="home_hero"
+        subhead="Submit a request for mobile car wash and detailing in Birmingham, Bloomfield Hills, Rochester Hills, or Troy, MI. We collect requests to check whether a local provider is available in your area."
+        directAnswer="Mobile car detailing in Birmingham, MI is a service in which a detailing provider travels to your location to wash and detail your vehicle. Submit a request to check availability — if a local provider can serve your area, they may contact you. Service availability is not guaranteed."
       />
 
       <section className="bg-white py-14 sm:py-20">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-            A simple way to book mobile detailing in Oakland County
+            A simple way to check availability in Oakland County
           </h2>
           <p className="mt-4 text-lg text-slate-700">
-            We are a local request and referral service. Submit a quick request
-            and we will help connect you with available mobile detailing
-            providers who serve your area. No driving to a wash bay, no waiting
-            in line.
+            Submit a quick request and we will check whether a local mobile
+            detailing provider can serve your area. We are a demand-validation
+            and referral service — not the direct detailing provider. Service
+            availability is not guaranteed.
           </p>
           <div className="mt-8 grid gap-6 sm:grid-cols-3">
             <Highlight
-              title="Comes to you"
-              body="At your home, condo, or workplace — wherever your vehicle is parked."
+              title="Submit a request"
+              body="Tell us about your vehicle and location. The form takes about a minute."
             />
             <Highlight
-              title="Local providers"
-              body="Mobile detailing providers serving Birmingham and nearby Oakland County cities."
+              title="Check availability"
+              body="We use your request to see whether a local provider can serve your area."
             />
             <Highlight
-              title="Honest matching"
-              body="We don't pretend to be the detailer. We help you get connected."
+              title="Honest framing"
+              body="We do not pretend to be the detailer and we do not guarantee service."
             />
           </div>
         </div>
@@ -69,7 +68,11 @@ export default function HomePage() {
 
       <CityLinks />
 
-      <QuoteRequestForm trackingLocation="home" />
+      <QuoteRequestForm
+        sourcePage="home"
+        defaultCity=""
+        defaultService=""
+      />
 
       <FAQSection faqs={GLOBAL_FAQS} />
 
@@ -83,7 +86,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <CTASection trackingLocation="home_bottom" />
+      <CTASection />
     </>
   );
 }
